@@ -1,0 +1,12 @@
+{% extends 'home.html' %}
+
+{% block content %}
+    <h2>Добавить новое объявление</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Опубликовать</button>
+        <a href="{% url 'home' %}" class="btn" style="background: #ccc; color: black;">Отмена</a>
+    </form>
+{% endblock %}
+

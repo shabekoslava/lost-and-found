@@ -1,0 +1,18 @@
+{% extends 'home.html' %}
+
+{% block content %}
+    <h2>Личный кабинет</h2>
+    
+    <form method="post" style="max-width: 500px;">
+        {% csrf_token %}
+        
+        <h3>Данные аккаунта</h3>
+        {{ u_form.as_p }} <!-- Поля: никнейм, email -->
+        
+        <h3>Дополнительная информация</h3>
+        {{ p_form.as_p }} <!-- Поля: факультет, группа, телефон -->
+        
+        <button type="submit" class="btn">Сохранить изменения</button>
+        <button type="button" onclick="window.location.href='{% url 'home' %}';">На главную</button>
+    </form>
+{% endblock %}

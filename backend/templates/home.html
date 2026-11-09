@@ -1,0 +1,48 @@
+<h1>Главная страница</h1>
+
+{% if user.is_authenticated %}
+    <p>Привет, {{ user.username }}!</p>
+    <a href="{% url 'profile' %}" class="btn">Мой профиль</a>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+    {% csrf_token %}
+    <button type="submit" style="background:none; border:none; color:blue; text-decoration:underline; cursor:pointer; padding:0; font-family:inherit; font-size:inherit;">
+        Выйти
+    </button>
+</form>
+{% else %}
+    <p>Вы не авторизованы.</p>
+    <a href="{% url 'login' %}">Войти</a>
+{% endif %}
+
+{% if not user.is_authenticated %}
+    <a href="{% url 'register' %}">Регистрация</a>
+{% endif %}
+
+<a href="{% url 'add_item' %}" class="btn">+ Добавить объявление</a>
+
+{% block content %}
+    <h2>Последние объявления</h2>
+
+    {% for item in items %}
+        <div class="card">
+            <h3>{{ item.title }}</h3>
+            {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.title }}" style="max-width: 100%; height: 200px; object-fit: cover; border-radius: 5px;">
+            {% else %}
+                <p><em>Фото нет</em></p>
+            {% endif %}
+            <p>Статус:
+                <span class="{% if item.status == 'lost' %}status-lost{% else %}status-found{% endif %}">
+                    {{ item.get_status_display }}
+                </span>
+            <p><strong>Корпус:</strong> {{ item.building.name }}</p>
+            </p>
+            <p><strong>Где:</strong> {{ item.location }}</p>
+            <p><strong>Описание: </strong> {{ item.description }}</p>
+            <p><small>Автор: {{ item.author.username }} | Дата: {{ item.created_at|date:"d.m.Y" }}</small></p>
+        </div>
+    {% empty %}
+        <p>Пока нет объявлений.</p>
+    {% endfor %}
+{% endblock %}
+
