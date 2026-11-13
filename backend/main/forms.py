@@ -14,8 +14,6 @@ class ItemForm(forms.ModelForm):
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True, label="Email")
-    faculty = forms.CharField(max_length=100, required=False, label="Факультет")
-    group = forms.CharField(max_length=50, required=False, label="Группа")
 
     class Meta:
         model = User
@@ -24,12 +22,10 @@ class CustomUserCreationForm(UserCreationForm):
     def save(self, commit=True):
         user = super().save(commit=False)
         user.email = self.cleaned_data["email"]
+
         if commit:
             user.save()
-            profile = user.profile
-            profile.faculty = self.cleaned_data["faculty"]
-            profile.group = self.cleaned_data["group"]
-            profile.save()
+
         return user
 
 # Форма РЕДАКТИРОВАНИЯ ПРОФИЛЯ

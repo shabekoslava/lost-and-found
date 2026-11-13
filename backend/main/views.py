@@ -5,6 +5,8 @@ from .models import Item, Profile
 from .serializers import ItemSerializer
 from django.contrib.auth.decorators import login_required
 from .forms import ItemForm, CustomUserCreationForm, UserUpdateForm, ProfileUpdateForm
+from django.views.decorators.csrf import ensure_csrf_cookie
+from .permissions import IsAuthorOrReadOnly
 
 def hello_view(request):
     return HttpResponse('Hello')
@@ -21,13 +23,7 @@ def register(request):
 
     return render(request, 'registration/register.html', {'form': form})
 
-class ItemListCreateView(generics.ListCreateAPIView):
-    queryset = Item.objects.all()
-    serializer_class = ItemSerializer
-
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
+@ensure_csrf_cookie
 def home(request):
     all_items = Item.objects.all()
     return render(request, 'home.html', {'items': all_items})
@@ -62,6 +58,7 @@ class ItemListCreateView(generics.ListCreateAPIView):
 class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
+    permission_classes = [IsAuthorOrReadOnly]
 
 @login_required
 def create_item(request):

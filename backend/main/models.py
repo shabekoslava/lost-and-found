@@ -28,15 +28,6 @@ class Profile(models.Model):
         verbose_name = "Профиль"
         verbose_name_plural = "Профили"
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
-
 class Building(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название корпуса")
     address = models.CharField(max_length=255, blank=True, verbose_name="Адрес (необязательно)")
@@ -97,7 +88,6 @@ class Item(models.Model):
 
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.get_or_create(user=instance)
+def create_user_profile(sender, instance, **kwargs):
+    Profile.objects.get_or_create(user=instance)
 
