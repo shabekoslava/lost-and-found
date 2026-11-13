@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Бюро находок</title>
+<link rel="stylesheet" href="tstCSS.css">
+</head>
+<body>
+
+<div id="mainApp">
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">Бюро находок</div>
+      <input class="search" type="text" placeholder="Поиск по объявлениям...">
+      <div class="header-guest" id="headerGuest">
+        <button class="btn-login" id="openLoginBtn">Войти</button>
+      </div>
+      <div class="header-user hidden" id="headerUserBlock">
+        <span class="user-name" id="headerUserName">Пользователь</span>
+        <div class="avatar avatar-small" id="headerAvatar"></div>
+        <button class="btn-logout" id="logoutBtn">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar-left">
+      <a href="#" class="menu-item" data-target="profile"><div class="icon icon-profile"></div><span>Мой профиль</span></a>
+      <a href="#" class="menu-item active" data-target="feed"><div class="icon icon-feed"></div><span>Лента</span></a>
+      <a href="#" class="menu-item" data-target="messages"><div class="icon icon-messages"></div><span>Сообщения</span></a>
+      <a href="#" class="menu-item" data-target="lost"><div class="icon icon-lost"></div><span>Мои находки</span></a>
+      <a href="#" class="menu-item" data-target="settings"><div class="icon icon-settings"></div><span>Настройки</span></a>
+    </aside>
+
+    <main class="feed">
+      <!-- ВКЛАДКА: ЛЕНТА -->
+      <div class="tab-content active" id="tab-feed">
+        <div class="card create-post">
+          <div class="avatar avatar-small"></div>
+          <div class="post-input-area">
+            <button class="btn-open-post-modal" id="openCreatePostBtn">Опишите потерянную или найденную вещь...</button>
+          </div>
+        </div>
+
+        <div class="filters">
+          <div class="dropdown" data-dropdown>
+            <button class="dropdown-toggle" data-toggle><span class="dropdown-label">Тип: <span data-label-type>Все</span></span><span class="dropdown-arrow">▼</span></button>
+            <div class="dropdown-menu hidden" data-menu>
+              <label class="dropdown-item"><input type="checkbox" value="lost" data-filter="type"><span>Потеряно</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="found" data-filter="type"><span>Найдено</span></label>
+            </div>
+          </div>
+          <div class="dropdown" data-dropdown>
+            <button class="dropdown-toggle" data-toggle><span class="dropdown-label">Корпус: <span data-label-building>Все</span></span><span class="dropdown-arrow">▼</span></button>
+            <div class="dropdown-menu hidden" data-menu style="max-height: 300px; overflow-y: auto;">
+              <label class="dropdown-item"><input type="checkbox" value="main" data-filter="building"><span>Главный корпус</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="1" data-filter="building"><span>Корпус 1</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="2" data-filter="building"><span>Корпус 2</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="3" data-filter="building"><span>Корпус 3</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="4" data-filter="building"><span>Корпус 4</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="5" data-filter="building"><span>Корпус 5</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="6" data-filter="building"><span>Корпус 6</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="7" data-filter="building"><span>Корпус 7</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="8" data-filter="building"><span>Корпус 8</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="9" data-filter="building"><span>Корпус 9</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="10" data-filter="building"><span>Корпус 10</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="11" data-filter="building"><span>Корпус 11</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="12" data-filter="building"><span>Корпус 12</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="15" data-filter="building"><span>Корпус 15</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="16" data-filter="building"><span>Корпус 16</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="16a" data-filter="building"><span>Корпус 16А</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="16b" data-filter="building"><span>Корпус 16Б</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="18" data-filter="building"><span>Корпус 18</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="19" data-filter="building"><span>Корпус 19</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="20" data-filter="building"><span>Корпус 20</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="21" data-filter="building"><span>Корпус 21</span></label>
+              <label class="dropdown-item"><input type="checkbox" value="library" data-filter="building"><span>НТБ (Библиотека)</span></label>
+            </div>
+          </div>
+          <button class="btn-reset" id="resetFilters">Сбросить</button>
+        </div>
+
+        <div id="postsContainer"></div>
+        <div class="empty-state" id="emptyState" style="display: none;">По выбранным фильтрам ничего не найдено</div>
+      </div>
+
+      <!-- ВКЛАДКА: ПРОФИЛЬ -->
+      <div class="tab-content" id="tab-profile">
+        <div class="card">
+          <div class="profile-header">
+            <div class="avatar avatar-large" id="profileAvatar"></div>
+            <div class="profile-info">
+              <div class="profile-name" id="profileNameDisplay">Иван Иванов</div>
+              <div class="profile-nickname" id="profileNicknameDisplay">@username</div>
+              <div class="profile-role">Студент</div>
+            </div>
+            <button class="btn-action" id="openEditProfileBtn">Редактировать профиль</button>
+          </div>
+          <div class="profile-details">
+            <div class="detail-row"><span>Инженерная школа:</span> <strong id="profileSchoolDisplay">Не указана</strong></div>
+            <div class="detail-row"><span>Группа:</span> <strong id="profileGroupDisplay">Не указана</strong></div>
+            <div class="detail-row" style="flex-direction: column; gap: 4px; align-items: flex-start;"><span>О себе:</span><strong id="profileBioDisplay" style="font-weight: 400; color: var(--color-text);">Не указано</strong></div>
+            <div class="detail-row"><span>Email:</span> <span id="profileEmailDisplay">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ВКЛАДКА: СООБЩЕНИЯ -->
+      <div class="tab-content" id="tab-messages">
+        <div class="card"><h2 class="block-title">Сообщения</h2><div class="empty-state" style="padding: 20px;">У вас пока нет новых сообщений.</div></div>
+      </div>
+
+      <!-- ВКЛАДКА: МОИ НАХОДКИ -->
+      <div class="tab-content" id="tab-lost">
+        <div class="card" style="background: transparent; border: none; padding: 0;">
+          <h2 class="block-title" style="padding: 0 12px;">Мои публикации</h2>
+          <div id="myPostsContainer"></div>
+        </div>
+      </div>
+
+      <!-- ВКЛАДКА: НАСТРОЙКИ -->
+      <div class="tab-content" id="tab-settings">
+        <div class="card">
+          <h2 class="block-title">Системные настройки</h2>
+          <div class="settings-group">
+            <label class="settings-item">
+              <div><div class="settings-title">Уведомления на почту</div><div class="settings-desc">Получать сообщения о найденных вещах</div></div>
+              <input type="checkbox" class="toggle-switch" checked>
+            </label>
+          </div>
+          <div class="settings-group">
+            <label class="settings-item">
+              <div><div class="settings-title">Тёмная тема</div><div class="settings-desc">В разработке</div></div>
+              <input type="checkbox" class="toggle-switch" disabled>
+            </label>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ПРАВОЕ МЕНЮ -->
+    <aside class="sidebar-right">
+      <div class="card">
+        <div class="block-title">Статистика</div>
+        <div class="stat-row"><span>Найдено вещей:</span><span>128</span></div>
+        <div class="stat-row"><span>Потеряно:</span><span>94</span></div>
+        <div class="stat-row"><span>Возвращено:</span><span>76</span></div>
+      </div>
+      <div class="card">
+        <div class="block-title">Полезное</div>
+        <ul class="link-list">
+          <!-- ДОБАВИЛИ data-info для вызова модалки -->
+          <li><a href="#" data-info="how-to-get">Как забрать вещь</a></li>
+          <li><a href="#" data-info="rules">Правила бюро</a></li>
+          <li><a href="#" data-info="contacts">Контакты</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- МОДАЛКА ВХОДА / РЕГИСТРАЦИИ  -->
+<div class="modal-overlay hidden" id="loginModal">
+  <div class="modal" style="max-width: 400px;">
+    <button class="modal-close" id="closeLoginBtn">×</button>
+    
+    <!-- Переключатель вкладок -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLoginBtn">Вход</button>
+      <button class="auth-tab" id="tabRegisterBtn">Регистрация</button>
+    </div>
+
+    <form class="modal-form" id="loginForm" novalidate>
+      <!-- Поле "Имя" (показывается только при регистрации) -->
+      <label class="form-field hidden" id="regNameField">
+        <span>Ваше имя</span>
+        <input type="text" id="regNameInput" placeholder="Иван">
+      </label>
+      
+      <label class="form-field">
+        <span>Email</span>
+        <input type="email" id="emailInput" placeholder="you@tpu.ru" required>
+      </label>
+      <label class="form-field">
+        <span>Пароль</span>
+        <input type="password" id="passwordInput" placeholder="••••••••" required>
+      </label>
+      
+      <div class="auth-error hidden" id="authError">Ошибка</div>
+      
+      <button type="submit" class="btn-primary modal-submit" id="authSubmitBtn">Войти</button>
+    </form>
+  </div>
+</div>
+
+<!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПРОФИЛЯ -->
+<div class="modal-overlay hidden" id="editProfileModal">
+  <div class="modal">
+    <button class="modal-close" id="closeEditProfileBtn">×</button>
+    <h2 class="modal-title">Редактировать профиль</h2>
+    <div class="edit-avatar-section">
+      <div class="avatar avatar-large" id="editAvatarPreview"></div>
+      <div class="edit-avatar-btns">
+        <label for="avatarUpload" class="btn-action" style="text-align: center; cursor: pointer;">Загрузить</label>
+        <input type="file" id="avatarUpload" accept="image/*" class="hidden">
+        <button type="button" class="btn-action btn-action-danger" id="removeAvatarBtn">Удалить</button>
+      </div>
+    </div>
+    <div class="modal-form">
+      <div class="form-row">
+        <label class="form-field"><span>Имя</span><input type="text" id="editFirstName" placeholder="Иван"></label>
+        <label class="form-field"><span>Фамилия</span><input type="text" id="editLastName" placeholder="Иванов"></label>
+      </div>
+      <label class="form-field"><span>Никнейм (для шапки)</span><input type="text" id="editNickname" placeholder="@username"></label>
+      <label class="form-field"><span>Инженерная школа</span><input type="text" id="editSchool" placeholder="ИШИТР"></label>
+      <label class="form-field"><span>Группа</span><input type="text" id="editGroup" placeholder="8К63"></label>
+      <label class="form-field"><span>О себе</span><textarea id="editBio" placeholder="Telegram @username или телефон" rows="3"></textarea></label>
+      <button type="button" class="btn-primary modal-submit" id="saveProfileBtn">Сохранить изменения</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА СОЗДАНИЯ ПОСТА -->
+<div class="modal-overlay hidden" id="createPostModal">
+  <div class="modal">
+    <button class="modal-close" id="closeCreatePostBtn">×</button>
+    <h2 class="modal-title">Создать объявление</h2>
+    <div class="modal-form">
+      <div class="form-row">
+        <label class="form-field"><span>Я</span><select id="postTypeSelect"><option value="lost">Потерял(а)</option><option value="found">Нашел(ла)</option></select></label>
+        <label class="form-field"><span>Корпус</span><select id="postBuildingSelect"><option value="main">Главный корпус</option><option value="1">Корпус 1</option><option value="2">Корпус 2</option><option value="3">Корпус 3</option><option value="4">Корпус 4</option><option value="5">Корпус 5</option><option value="6">Корпус 6</option><option value="7">Корпус 7</option><option value="8">Корпус 8</option><option value="9">Корпус 9</option><option value="10">Корпус 10</option><option value="11">Корпус 11</option><option value="12">Корпус 12</option><option value="15">Корпус 15</option><option value="16">Корпус 16</option><option value="16a">Корпус 16А</option><option value="16b">Корпус 16Б</option><option value="18">Корпус 18</option><option value="19">Корпус 19</option><option value="20">Корпус 20</option><option value="21">Корпус 21</option><option value="library">НТБ</option></select></label>
+      </div>
+      <label class="form-field"><span>Описание</span><textarea id="postTextInput" placeholder="Опишите вещь..." rows="4"></textarea></label>
+      <div class="photo-upload" style="margin-bottom: 10px;">
+        <label for="postPhotoUpload" class="photo-label">📷 Прикрепить фото</label>
+        <input type="file" id="postPhotoUpload" accept="image/*" class="hidden">
+        <div class="photo-preview-wrapper hidden" id="postPhotoPreviewWrapper">
+          <div class="photo-preview" id="postPhotoPreview"></div>
+          <button type="button" class="btn-remove-photo" id="removePostPhotoBtn">×</button>
+        </div>
+      </div>
+      <button type="button" class="btn-primary modal-submit" id="submitPostBtn">Опубликовать</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА -->
+<div class="modal-overlay hidden" id="editPostModal">
+  <div class="modal">
+    <button class="modal-close" id="closeEditPostBtn">×</button>
+    <h2 class="modal-title">Редактировать объявление</h2>
+    <div class="modal-form">
+      <input type="hidden" id="editPostId">
+      <label class="form-field"><span>Описание</span><textarea id="editPostText" rows="4"></textarea></label>
+      <div class="photo-upload" style="margin-bottom: 10px;">
+        <label for="editPostPhotoUpload" class="photo-label">📷 Изменить фото</label>
+        <input type="file" id="editPostPhotoUpload" accept="image/*" class="hidden">
+        <div class="photo-preview-wrapper hidden" id="editPostPhotoPreviewWrapper">
+          <div class="photo-preview" id="editPostPhotoPreview"></div>
+          <button type="button" class="btn-remove-photo" id="removeEditPostPhotoBtn">×</button>
+        </div>
+      </div>
+      <button type="button" class="btn-primary modal-submit" id="saveEditedPostBtn">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА: ПОЛЕЗНАЯ ИНФОРМАЦИЯ -->
+<div class="modal-overlay hidden" id="infoModal">
+  <div class="modal" style="max-width: 500px;">
+    <button class="modal-close" id="closeInfoBtn">×</button>
+    <h2 class="modal-title" id="infoModalTitle">Заголовок</h2>
+    <div id="infoModalContent" style="line-height: 1.6; font-size: 14px;"></div>
+  </div>
+</div>
+
+<script src="tstJS.js"></script>
+</body>
+</html>
