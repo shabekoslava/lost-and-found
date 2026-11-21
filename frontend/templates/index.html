@@ -226,12 +226,86 @@
   <div class="modal">
     <button class="modal-close" id="closeCreatePostBtn">×</button>
     <h2 class="modal-title">Создать объявление</h2>
+    
     <div class="modal-form">
+      
+      <!--  Название -->
+      <label class="form-field">
+        <span>Название (например: "Потеряны ключи")</span>
+        <input type="text" id="postTitleInput" placeholder="Кратко, что потеряли/нашли" required>
+      </label>
+
       <div class="form-row">
-        <label class="form-field"><span>Я</span><select id="postTypeSelect"><option value="lost">Потерял(а)</option><option value="found">Нашел(ла)</option></select></label>
-        <label class="form-field"><span>Корпус</span><select id="postBuildingSelect"><option value="main">Главный корпус</option><option value="1">Корпус 1</option><option value="2">Корпус 2</option><option value="3">Корпус 3</option><option value="4">Корпус 4</option><option value="5">Корпус 5</option><option value="6">Корпус 6</option><option value="7">Корпус 7</option><option value="8">Корпус 8</option><option value="9">Корпус 9</option><option value="10">Корпус 10</option><option value="11">Корпус 11</option><option value="12">Корпус 12</option><option value="15">Корпус 15</option><option value="16">Корпус 16</option><option value="16a">Корпус 16А</option><option value="16b">Корпус 16Б</option><option value="18">Корпус 18</option><option value="19">Корпус 19</option><option value="20">Корпус 20</option><option value="21">Корпус 21</option><option value="library">НТБ</option></select></label>
+        <!-- Статус -->
+        <label class="form-field">
+          <span>Статус</span>
+          <select id="postTypeSelect">
+            <option value="lost">Потерял(а)</option>
+            <option value="found">Нашел(ла)</option>
+          </select>
+        </label>
+        
+        <!-- Категория -->
+        <label class="form-field">
+          <span>Категория</span>
+          <select id="postCategorySelect">
+            <option value="1">Электроника</option>
+            <option value="2">Документы</option>
+            <option value="3">Одежда</option>
+            <option value="4">Другое</option>
+          </select>
+        </label>
       </div>
-      <label class="form-field"><span>Описание</span><textarea id="postTextInput" placeholder="Опишите вещь..." rows="4"></textarea></label>
+
+      <div class="form-row">
+        <!-- Корпус -->
+        <label class="form-field">
+          <span>Корпус</span>
+          <select id="postBuildingSelect">
+            <option value="main">Главный корпус</option>
+            <option value="1">Корпус 1</option>
+            <option value="2">Корпус 2</option>
+            <option value="3">Корпус 3</option>
+            <option value="4">Корпус 4</option>
+            <option value="5">Корпус 5</option>
+            <option value="6">Корпус 6</option>
+            <option value="7">Корпус 7</option>
+            <option value="8">Корпус 8</option>
+            <option value="9">Корпус 9</option>
+            <option value="10">Корпус 10</option>
+            <option value="11">Корпус 11</option>
+            <option value="12">Корпус 12</option>
+            <option value="15">Корпус 15</option>
+            <option value="16">Корпус 16</option>
+            <option value="16a">Корпус 16А</option>
+            <option value="16b">Корпус 16Б</option>
+            <option value="18">Корпус 18</option>
+            <option value="19">Корпус 19</option>
+            <option value="20">Корпус 20</option>
+            <option value="21">Корпус 21</option>
+            <option value="library">НТБ</option>
+          </select>
+        </label>
+
+        <!-- Дата события -->
+        <label class="form-field">
+          <span>Дата события</span>
+          <input type="date" id="postDateEventInput">
+        </label>
+      </div>
+
+      <!-- Место -->
+      <label class="form-field">
+        <span>Конкретное место (аудитория, этаж)</span>
+        <input type="text" id="postLocationInput" placeholder="Например: ауд. 305">
+      </label>
+
+      <!-- Описание -->
+      <label class="form-field">
+        <span>Подробное описание</span>
+        <textarea id="postTextInput" placeholder="Опишите приметы вещи..." rows="3"></textarea>
+      </label>
+
       <div class="photo-upload" style="margin-bottom: 10px;">
         <label for="postPhotoUpload" class="photo-label">📷 Прикрепить фото</label>
         <input type="file" id="postPhotoUpload" accept="image/*" class="hidden">
@@ -240,6 +314,7 @@
           <button type="button" class="btn-remove-photo" id="removePostPhotoBtn">×</button>
         </div>
       </div>
+
       <button type="button" class="btn-primary modal-submit" id="submitPostBtn">Опубликовать</button>
     </div>
   </div>
