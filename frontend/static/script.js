@@ -77,7 +77,7 @@ function switchAuthMode(mode) {
 tabLoginBtn.addEventListener('click', () => switchAuthMode('login'));
 tabRegisterBtn.addEventListener('click', () => switchAuthMode('register'));
 
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = emailInput.value.trim().toLowerCase();
   const password = passwordInput.value.trim();
@@ -89,23 +89,38 @@ loginForm.addEventListener('submit', (e) => {
     return;
   }
 
-  if (authMode === 'register') {
-    if (name === '') {
-      authError.textContent = 'Введите ваше имя';
-      authError.classList.remove('hidden');
-      return;
+  // Адреса для входа и регистрации 
+  const loginUrl = authMode === 'register' ? '/api/register/' : '/api/login/';
+
+  try {
+    authSubmitBtn.textContent = 'Загрузка...';
+    authSubmitBtn.disabled = true;
+
+    const response = await fetch(loginUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')
+      },
+      body: JSON.stringify({ 
+        email: email, 
+        password: password,
+        username: name
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Неверный логин или пароль');
     }
-    usersDB.push({ name: name, email: email, password: password });
-    localStorage.setItem('usersDB', JSON.stringify(usersDB));
-    loginSuccess(email, name);
-  } else {
-    const user = usersDB.find(u => u.email === email && u.password === password);
-    if (!user) {
-      authError.textContent = 'Неверный email или пароль';
-      authError.classList.remove('hidden');
-      return;
-    }
-    loginSuccess(email, user.name);
+
+    loginSuccess(email, name); // Если успешно, заходим
+
+  } catch (error) {
+    authError.textContent = error.message;
+    authError.classList.remove('hidden');
+  } finally {
+    authSubmitBtn.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+    authSubmitBtn.disabled = false;
   }
 });
 
