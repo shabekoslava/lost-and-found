@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import ItemForm, CustomUserCreationForm, UserUpdateForm, ProfileUpdateForm
 from django.views.decorators.csrf import ensure_csrf_cookie
 from .permissions import IsAuthorOrReadOnly
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 def hello_view(request):
     return HttpResponse('Hello')
@@ -28,20 +29,33 @@ def home(request):
     all_items = Item.objects.all()
     return render(request, 'home.html', {'items': all_items})
 
+class ReadOnlyOrAuthenticated(BasePermission):
+    def has_permission(self, request, view):
+        return (
+            request.method in SAFE_METHODS
+            or request.user.is_authenticated
+        )
+
 class ItemListCreateView(generics.ListCreateAPIView):
     serializer_class = ItemSerializer
+    permission_classes = [ReadOnlyOrAuthenticated]
 
     def get_queryset(self):
         queryset = Item.objects.all()
+
         category_id = self.request.query_params.get('category')
-        status = self.request.query_params.get('status')
+        statuses = self.request.query_params.getlist('status')
+        buildings = self.request.query_params.getlist('building')
         search_query = self.request.query_params.get('search')
 
         if category_id:
             queryset = queryset.filter(category_id=category_id)
 
-        if status:
-            queryset = queryset.filter(status=status)
+        if statuses:
+            queryset = queryset.filter(status__in=statuses)
+
+        if buildings:
+            queryset = queryset.filter(building_id__in=buildings)
 
         if search_query:
             from django.db.models import Q
