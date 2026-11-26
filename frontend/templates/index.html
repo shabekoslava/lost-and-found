@@ -1,8 +1,10 @@
-{% load static %}
+{% load static tz %}
+{% get_current_timezone as site_time_zone %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Бюро находок</title>
 <link rel="stylesheet" href="{% static 'style.css' %}"> 
 </head>
@@ -11,71 +13,106 @@
 <div id="mainApp">
   <header class="header">
     <div class="header-inner">
-      <div class="logo">Бюро находок</div>
-      <input class="search" type="text" placeholder="Поиск по объявлениям...">
+      <button type="button" class="btn-menu" id="mobileMenuBtn" aria-controls="sidebarNav" aria-expanded="false" aria-label="Открыть меню">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <span>Меню</span>
+      </button>
+      <a class="logo" href="{% url 'home' %}" aria-label="Бюро находок — перейти в ленту">Бюро находок</a>
       <div class="header-guest" id="headerGuest">
         <button class="btn-login" id="openLoginBtn">Войти</button>
       </div>
       <div class="header-user hidden" id="headerUserBlock">
         <span class="user-name" id="headerUserName">Пользователь</span>
-        <div class="avatar avatar-small" id="headerAvatar"></div>
+        <div class="avatar avatar-small" id="headerAvatar" aria-hidden="true"></div>
         <button class="btn-logout" id="logoutBtn">Выйти</button>
       </div>
     </div>
   </header>
 
   <div class="layout">
-    <aside class="sidebar-left">
-      <a href="#" class="menu-item" data-target="profile"><div class="icon icon-profile"></div><span>Мой профиль</span></a>
-      <a href="#" class="menu-item active" data-target="feed"><div class="icon icon-feed"></div><span>Лента</span></a>
-      <a href="#" class="menu-item" data-target="messages"><div class="icon icon-messages"></div><span>Сообщения</span></a>
-      <a href="#" class="menu-item" data-target="lost"><div class="icon icon-lost"></div><span>Мои находки</span></a>
-      <a href="#" class="menu-item" data-target="settings"><div class="icon icon-settings"></div><span>Настройки</span></a>
+    <div class="sidebar-backdrop hidden" id="sidebarBackdrop"></div>
+    <aside class="sidebar-left" id="sidebarNav" aria-label="Боковое меню">
+      <div class="sidebar-drawer-header">
+        <span class="sidebar-drawer-title">Меню</span>
+        <button type="button" class="sidebar-close" id="closeSidebarBtn" aria-label="Закрыть меню">×</button>
+      </div>
+      <a href="#" class="menu-item" data-target="profile">
+        <div class="icon icon-profile" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="3.5"></circle>
+            <path d="M5 20a7 7 0 0 1 14 0"></path>
+          </svg>
+        </div>
+        <span>Мой профиль</span>
+      </a>
+      <a href="#" class="menu-item active" data-target="feed">
+        <div class="icon icon-feed" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2.5"></rect>
+            <line x1="8" y1="9" x2="16" y2="9"></line>
+            <line x1="8" y1="13" x2="16" y2="13"></line>
+            <line x1="8" y1="17" x2="13" y2="17"></line>
+          </svg>
+        </div>
+        <span>Лента</span>
+      </a>
+      <a href="#" class="menu-item" data-target="messages">
+        <div class="icon icon-messages" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 14a2 2 0 0 1-2 2H8l-4 4V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <span>Сообщения</span>
+      </a>
+      <a href="#" class="menu-item" data-target="lost">
+        <div class="icon icon-lost" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 20H5a2 2 0 0 1-2-2V8l3-4h12l3 4v4"></path>
+            <line x1="3" y1="8" x2="21" y2="8"></line>
+            <line x1="12" y1="4" x2="12" y2="8"></line>
+            <circle cx="17" cy="16.5" r="3"></circle>
+            <line x1="19.2" y1="18.7" x2="21.5" y2="21"></line>
+          </svg>
+        </div>
+        <span>Мои находки</span>
+      </a>
+      <a href="#" class="menu-item" data-target="settings">
+        <div class="icon icon-settings" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <span>Настройки</span>
+      </a>
     </aside>
 
     <main class="feed">
       <!-- ВКЛАДКА: ЛЕНТА -->
       <div class="tab-content active" id="tab-feed">
         <div class="card create-post">
-          <div class="avatar avatar-small"></div>
-          <div class="post-input-area">
-            <button class="btn-open-post-modal" id="openCreatePostBtn">Опишите потерянную или найденную вещь...</button>
-          </div>
+          <button type="button" class="btn-open-post-modal" id="openCreatePostBtn" data-open-create-post>
+            <span class="create-post-icon" aria-hidden="true">+</span>
+            <span>Создать объявление</span>
+          </button>
         </div>
 
         <div class="filters">
           <div class="dropdown" data-dropdown>
-            <button class="dropdown-toggle" data-toggle><span class="dropdown-label">Тип: <span data-label-type>Все</span></span><span class="dropdown-arrow">▼</span></button>
+            <button class="dropdown-toggle" data-toggle><span class="dropdown-label">Тип: <span data-label-type>Активные</span></span><span class="dropdown-arrow">▼</span></button>
             <div class="dropdown-menu hidden" data-menu>
               <label class="dropdown-item"><input type="checkbox" value="lost" data-filter="type"><span>Потеряно</span></label>
               <label class="dropdown-item"><input type="checkbox" value="found" data-filter="type"><span>Найдено</span></label>
             </div>
           </div>
-          <div class="dropdown" data-dropdown>
-            <button class="dropdown-toggle" data-toggle><span class="dropdown-label">Корпус: <span data-label-building>Все</span></span><span class="dropdown-arrow">▼</span></button>
-            <div class="dropdown-menu hidden" data-menu style="max-height: 300px; overflow-y: auto;">
-              <label class="dropdown-item"><input type="checkbox" value="main" data-filter="building"><span>Главный корпус</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="1" data-filter="building"><span>Корпус 1</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="2" data-filter="building"><span>Корпус 2</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="3" data-filter="building"><span>Корпус 3</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="4" data-filter="building"><span>Корпус 4</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="5" data-filter="building"><span>Корпус 5</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="6" data-filter="building"><span>Корпус 6</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="7" data-filter="building"><span>Корпус 7</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="8" data-filter="building"><span>Корпус 8</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="9" data-filter="building"><span>Корпус 9</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="10" data-filter="building"><span>Корпус 10</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="11" data-filter="building"><span>Корпус 11</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="12" data-filter="building"><span>Корпус 12</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="15" data-filter="building"><span>Корпус 15</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="16" data-filter="building"><span>Корпус 16</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="16a" data-filter="building"><span>Корпус 16А</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="16b" data-filter="building"><span>Корпус 16Б</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="18" data-filter="building"><span>Корпус 18</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="19" data-filter="building"><span>Корпус 19</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="20" data-filter="building"><span>Корпус 20</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="21" data-filter="building"><span>Корпус 21</span></label>
-              <label class="dropdown-item"><input type="checkbox" value="library" data-filter="building"><span>НТБ (Библиотека)</span></label>
+          <div class="dropdown place-dropdown" data-dropdown>
+            <button class="dropdown-toggle" data-toggle><span class="dropdown-label">Место: <span data-label-building>Все</span></span><span class="dropdown-arrow">▼</span></button>
+            <div class="dropdown-menu hidden" data-menu id="buildingFilterMenu">
+              <div style="padding: 8px 10px; color: var(--color-text-muted); font-size: 13px;">Загрузка мест...</div>
             </div>
           </div>
           <button class="btn-reset" id="resetFilters">Сбросить</button>
@@ -89,7 +126,7 @@
       <div class="tab-content" id="tab-profile">
         <div class="card">
           <div class="profile-header">
-            <div class="avatar avatar-large" id="profileAvatar"></div>
+            <div class="avatar avatar-large" id="profileAvatar" aria-hidden="true"></div>
             <div class="profile-info">
               <div class="profile-name" id="profileNameDisplay">Иван Иванов</div>
               <div class="profile-nickname" id="profileNicknameDisplay">@username</div>
@@ -108,13 +145,16 @@
 
       <!-- ВКЛАДКА: СООБЩЕНИЯ -->
       <div class="tab-content" id="tab-messages">
-        <div class="card"><h2 class="block-title">Сообщения</h2><div class="empty-state" style="padding: 20px;">У вас пока нет новых сообщений.</div></div>
+        <div class="card"><h2 class="block-title">Сообщения</h2><div class="empty-state" style="padding: 20px;">Переписка запланирована на следующий семестр.</div></div>
       </div>
 
       <!-- ВКЛАДКА: МОИ НАХОДКИ -->
       <div class="tab-content" id="tab-lost">
         <div class="card" style="background: transparent; border: none; padding: 0;">
-          <h2 class="block-title" style="padding: 0 12px;">Мои публикации</h2>
+          <div class="my-posts-header">
+            <h2 class="block-title">Мои публикации</h2>
+            <button type="button" class="btn-primary" data-open-create-post>Создать объявление</button>
+          </div>
           <div id="myPostsContainer"></div>
         </div>
       </div>
@@ -141,16 +181,14 @@
 
     <!-- ПРАВОЕ МЕНЮ -->
     <aside class="sidebar-right">
-      <div class="card">
+      <div class="card" id="itemStats" data-url="{% url 'item-stats' %}">
         <div class="block-title">Статистика</div>
-        <div class="stat-row"><span>Найдено вещей:</span><span>128</span></div>
-        <div class="stat-row"><span>Потеряно:</span><span>94</span></div>
-        <div class="stat-row"><span>Возвращено:</span><span>76</span></div>
+        <div class="stat-row"><span>Найдено вещей:</span><span data-item-status="found">—</span></div>
+        <div class="stat-row"><span>Потеряно:</span><span data-item-status="lost">—</span></div>
       </div>
       <div class="card">
         <div class="block-title">Полезное</div>
         <ul class="link-list">
-          <!-- ДОБАВИЛИ data-info для вызова модалки -->
           <li><a href="#" data-info="how-to-get">Как забрать вещь</a></li>
           <li><a href="#" data-info="rules">Правила бюро</a></li>
           <li><a href="#" data-info="contacts">Контакты</a></li>
@@ -160,37 +198,69 @@
   </div>
 </div>
 
-<!-- МОДАЛКА ВХОДА / РЕГИСТРАЦИИ  -->
+<!-- МОДАЛКА ВХОДА / РЕГИСТРАЦИИ (BYUR-42, штатные маршруты Django) -->
 <div class="modal-overlay hidden" id="loginModal">
-  <div class="modal" style="max-width: 400px;">
+  <div class="modal" style="max-width: 420px;">
     <button class="modal-close" id="closeLoginBtn">×</button>
     
-    <!-- Переключатель вкладок -->
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tabLoginBtn">Вход</button>
-      <button class="auth-tab" id="tabRegisterBtn">Регистрация</button>
+      <button type="button" class="auth-tab active" id="tabLoginBtn">Вход</button>
+      <button type="button" class="auth-tab" id="tabRegisterBtn">Регистрация</button>
     </div>
 
-    <form class="modal-form" id="loginForm" novalidate>
-      <!-- Поле "Имя" (показывается только при регистрации) -->
-      <label class="form-field hidden" id="regNameField">
-        <span>Ваше имя</span>
-        <input type="text" id="regNameInput" placeholder="Иван">
-      </label>
-      
+    <!-- Форма входа (/accounts/login/) -->
+    <form class="modal-form" id="loginForm" action="/accounts/login/" method="POST" novalidate>
+      <input type="hidden" name="csrfmiddlewaretoken" id="loginCsrfToken" value="">
+      <input type="hidden" name="next" id="loginNextInput" value="/">
+
       <label class="form-field">
-        <span>Email</span>
-        <input type="email" id="emailInput" placeholder="you@tpu.ru" required>
+        <span>Имя пользователя (логин) *</span>
+        <input type="text" name="username" id="emailInput" placeholder="username" required autocomplete="username">
       </label>
       <label class="form-field">
-        <span>Пароль</span>
-        <input type="password" id="passwordInput" placeholder="••••••••" required>
+        <span>Пароль *</span>
+        <input type="password" name="password" id="passwordInput" placeholder="••••••••" required autocomplete="current-password">
       </label>
-      
-      <div class="auth-error hidden" id="authError">Ошибка</div>
+
+      <div class="auth-error hidden" id="authError"></div>
       
       <button type="submit" class="btn-primary modal-submit" id="authSubmitBtn">Войти</button>
     </form>
+
+    <!-- Форма регистрации (/register/) -->
+    <form class="modal-form hidden" id="registerForm" action="/register/" method="POST" novalidate>
+      <input type="hidden" name="csrfmiddlewaretoken" id="regCsrfToken" value="">
+
+      <label class="form-field">
+        <span>Имя пользователя (логин) *</span>
+        <input type="text" name="username" id="regUsernameInput" placeholder="ivan_tpu" required autocomplete="username">
+      </label>
+      <label class="form-field">
+        <span>Email *</span>
+        <input type="email" name="email" id="regEmailInput" placeholder="ivan@tpu.ru" required autocomplete="email">
+      </label>
+      <label class="form-field">
+        <span>Пароль *</span>
+        <input type="password" name="password1" id="regPassword1Input" placeholder="••••••••" required autocomplete="new-password">
+      </label>
+      <label class="form-field">
+        <span>Подтверждение пароля *</span>
+        <input type="password" name="password2" id="regPassword2Input" placeholder="••••••••" required autocomplete="new-password">
+      </label>
+      
+      <div class="auth-error hidden" id="regAuthError"></div>
+      
+      <button type="submit" class="btn-primary modal-submit" id="regSubmitBtn">Зарегистрироваться</button>
+    </form>
+
+    <!-- Прямые ссылки на формы Django -->
+    <div class="auth-django-links">
+      <span style="color: var(--color-text-muted);">Штатные страницы Django:</span>
+      <div style="margin-top: 6px; display: flex; justify-content: center; gap: 12px;">
+        <a href="/accounts/login/?next=/" class="django-link" id="djangoLoginLink">Страница входа</a>
+        <a href="/register/" class="django-link" id="djangoRegisterLink">Страница регистрации</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -204,6 +274,7 @@
       <div class="edit-avatar-btns">
         <label for="avatarUpload" class="btn-action" style="text-align: center; cursor: pointer;">Загрузить</label>
         <input type="file" id="avatarUpload" accept="image/*" class="hidden">
+        <button type="button" class="btn-action hidden" id="useLegacyAvatarBtn">Использовать фото из этого браузера</button>
         <button type="button" class="btn-action btn-action-danger" id="removeAvatarBtn">Удалить</button>
       </div>
     </div>
@@ -216,139 +287,156 @@
       <label class="form-field"><span>Инженерная школа</span><input type="text" id="editSchool" placeholder="ИШИТР"></label>
       <label class="form-field"><span>Группа</span><input type="text" id="editGroup" placeholder="8К63"></label>
       <label class="form-field"><span>О себе</span><textarea id="editBio" placeholder="Telegram @username или телефон" rows="3"></textarea></label>
+      <div class="form-error hidden" id="profileSaveError" role="alert"></div>
       <button type="button" class="btn-primary modal-submit" id="saveProfileBtn">Сохранить изменения</button>
     </div>
   </div>
 </div>
 
-<!-- МОДАЛКА СОЗДАНИЯ ПОСТА -->
+<!-- МОДАЛКА СОЗДАНИЯ ПОСТА (BYUR-37) -->
 <div class="modal-overlay hidden" id="createPostModal">
   <div class="modal">
-    <button class="modal-close" id="closeCreatePostBtn">×</button>
-    <h2 class="modal-title">Создать объявление</h2>
+    <button type="button" class="modal-close" id="closeCreatePostBtn" aria-label="Закрыть форму">×</button>
+    <h2 class="modal-title" id="postFormTitle">Создать объявление</h2>
     
-    <div class="modal-form">
-      
-      <!--  Название -->
-      <label class="form-field">
-        <span>Название (например: "Потеряны ключи")</span>
+    <form class="modal-form" id="createPostForm" novalidate>
+      <div class="form-error hidden" id="postFormError"></div>
+      <div class="form-success hidden" id="postFormSuccess" role="status"></div>
+
+      <!-- Название -->
+      <label class="form-field" id="field-title">
+        <span>Название (например: "Потеряны ключи") *</span>
         <input type="text" id="postTitleInput" placeholder="Кратко, что потеряли/нашли" required>
+        <span class="field-error hidden" id="error-title"></span>
       </label>
 
       <div class="form-row">
         <!-- Статус -->
-        <label class="form-field">
-          <span>Статус</span>
+        <label class="form-field" id="field-status">
+          <span>Статус *</span>
           <select id="postTypeSelect">
             <option value="lost">Потерял(а)</option>
             <option value="found">Нашел(ла)</option>
+            <option data-inactive-status hidden disabled></option>
           </select>
+          <span class="field-error hidden" id="error-status"></span>
         </label>
         
-        <!-- Категория -->
-        <label class="form-field">
-          <span>Категория</span>
+        <!-- Категория (динамически из справочника Django) -->
+        <label class="form-field" id="field-category">
+          <span>Категория *</span>
           <select id="postCategorySelect">
-            <option value="1">Электроника</option>
-            <option value="2">Документы</option>
-            <option value="3">Одежда</option>
-            <option value="4">Другое</option>
+            <option value="" disabled selected>Загрузка категорий...</option>
           </select>
+          <span class="field-error hidden" id="error-category"></span>
         </label>
       </div>
 
       <div class="form-row">
-        <!-- Корпус -->
-        <label class="form-field">
-          <span>Корпус</span>
+        <!-- Место из справочника Django -->
+        <label class="form-field" id="field-building">
+          <span>Корпус, общежитие или площадка</span>
           <select id="postBuildingSelect">
-            <option value="main">Главный корпус</option>
-            <option value="1">Корпус 1</option>
-            <option value="2">Корпус 2</option>
-            <option value="3">Корпус 3</option>
-            <option value="4">Корпус 4</option>
-            <option value="5">Корпус 5</option>
-            <option value="6">Корпус 6</option>
-            <option value="7">Корпус 7</option>
-            <option value="8">Корпус 8</option>
-            <option value="9">Корпус 9</option>
-            <option value="10">Корпус 10</option>
-            <option value="11">Корпус 11</option>
-            <option value="12">Корпус 12</option>
-            <option value="15">Корпус 15</option>
-            <option value="16">Корпус 16</option>
-            <option value="16a">Корпус 16А</option>
-            <option value="16b">Корпус 16Б</option>
-            <option value="18">Корпус 18</option>
-            <option value="19">Корпус 19</option>
-            <option value="20">Корпус 20</option>
-            <option value="21">Корпус 21</option>
-            <option value="library">НТБ</option>
+            <option value="">Не указан</option>
           </select>
+          <span class="field-error hidden" id="error-building"></span>
         </label>
 
-        <!-- Дата события -->
-        <label class="form-field">
-          <span>Дата события</span>
-          <input type="date" id="postDateEventInput">
+        <!-- Дата события (необязательно, при отсутствии уходит текущая) -->
+        <label class="form-field" id="field-date_event">
+          <span>Дата события (необязательно)</span>
+          <input type="date" id="postDateEventInput" max="{% now 'Y-m-d' %}" data-time-zone="{{ site_time_zone }}">
+          <span class="field-error hidden" id="error-date_event"></span>
         </label>
       </div>
 
       <!-- Место -->
-      <label class="form-field">
-        <span>Конкретное место (аудитория, этаж)</span>
-        <input type="text" id="postLocationInput" placeholder="Например: ауд. 305">
+      <label class="form-field" id="field-location">
+        <span>Конкретное место (аудитория, этаж) *</span>
+        <input type="text" id="postLocationInput" placeholder="Например: ауд. 305" required>
+        <span class="field-error hidden" id="error-location"></span>
       </label>
 
       <!-- Описание -->
-      <label class="form-field">
-        <span>Подробное описание</span>
-        <textarea id="postTextInput" placeholder="Опишите приметы вещи..." rows="3"></textarea>
+      <label class="form-field" id="field-description">
+        <span>Подробное описание *</span>
+        <textarea id="postTextInput" placeholder="Опишите приметы вещи..." rows="3" required></textarea>
+        <span class="field-error hidden" id="error-description"></span>
+      </label>
+
+      <label class="form-field" id="field-contact">
+        <span>Контакт для связи (необязательно)</span>
+        <input type="text" id="postContactInput" maxlength="160" placeholder="Telegram @username, телефон или почта" aria-describedby="postContactHelp">
+        <small id="postContactHelp">Этот контакт будет виден в объявлении.</small>
+        <span class="field-error hidden" id="error-contact"></span>
       </label>
 
       <div class="photo-upload" style="margin-bottom: 10px;">
-        <label for="postPhotoUpload" class="photo-label">📷 Прикрепить фото</label>
+        <label for="postPhotoUpload" class="photo-label">📷 Прикрепить фото (необязательно)</label>
         <input type="file" id="postPhotoUpload" accept="image/*" class="hidden">
         <div class="photo-preview-wrapper hidden" id="postPhotoPreviewWrapper">
           <div class="photo-preview" id="postPhotoPreview"></div>
-          <button type="button" class="btn-remove-photo" id="removePostPhotoBtn">×</button>
+          <button type="button" class="btn-remove-photo" id="removePostPhotoBtn" aria-label="Убрать фото">×</button>
         </div>
+        <span class="field-error hidden" id="error-image"></span>
       </div>
 
-      <button type="button" class="btn-primary modal-submit" id="submitPostBtn">Опубликовать</button>
-    </div>
-  </div>
-</div>
-
-<!-- МОДАЛКА РЕДАКТИРОВАНИЯ ПОСТА -->
-<div class="modal-overlay hidden" id="editPostModal">
-  <div class="modal">
-    <button class="modal-close" id="closeEditPostBtn">×</button>
-    <h2 class="modal-title">Редактировать объявление</h2>
-    <div class="modal-form">
-      <input type="hidden" id="editPostId">
-      <label class="form-field"><span>Описание</span><textarea id="editPostText" rows="4"></textarea></label>
-      <div class="photo-upload" style="margin-bottom: 10px;">
-        <label for="editPostPhotoUpload" class="photo-label">📷 Изменить фото</label>
-        <input type="file" id="editPostPhotoUpload" accept="image/*" class="hidden">
-        <div class="photo-preview-wrapper hidden" id="editPostPhotoPreviewWrapper">
-          <div class="photo-preview" id="editPostPhotoPreview"></div>
-          <button type="button" class="btn-remove-photo" id="removeEditPostPhotoBtn">×</button>
-        </div>
-      </div>
-      <button type="button" class="btn-primary modal-submit" id="saveEditedPostBtn">Сохранить</button>
-    </div>
+      <button type="submit" class="btn-primary modal-submit" id="submitPostBtn">Опубликовать</button>
+    </form>
   </div>
 </div>
 
 <!-- МОДАЛКА: ПОЛЕЗНАЯ ИНФОРМАЦИЯ -->
 <div class="modal-overlay hidden" id="infoModal">
-  <div class="modal" style="max-width: 500px;">
-    <button class="modal-close" id="closeInfoBtn">×</button>
-    <h2 class="modal-title" id="infoModalTitle">Заголовок</h2>
-    <div id="infoModalContent" style="line-height: 1.6; font-size: 14px;"></div>
+  <div class="modal info-modal" role="dialog" aria-labelledby="infoModalTitle">
+    <button type="button" class="modal-close" id="closeInfoBtn" aria-label="Закрыть">×</button>
+    <h2 class="modal-title" id="infoModalTitle"></h2>
+    <div class="info-modal-content" id="infoModalContent">
+      <section data-info-section="how-to-get" hidden>
+        <p>Если вы нашли свою вещь в объявлении:</p>
+        <ul>
+          <li>Нажмите кнопку «Связаться» под объявлением.</li>
+          <li>Свяжитесь с автором поста, чтобы договориться о встрече и подтвердить, что вещь ваша (назовите особые приметы, которых нет на фото).</li>
+          <li>Заберите вещь в указанном месте.</li>
+        </ul>
+        <p><strong>Помните:</strong> администрация сайта не хранит вещи. Мы лишь помогаем студентам и сотрудникам ТПУ найти друг друга. Не передавайте ценные вещи незнакомцам без свидетелей.</p>
+      </section>
+      <section data-info-section="rules" hidden>
+        <ol>
+          <li>Публикуйте только реальные объявления о потерянных или найденных вещах.</li>
+          <li>Обязательно указывайте корпус и аудиторию (или конкретное место), чтобы владелец мог быстро сориентироваться.</li>
+          <li>Запрещено размещать спам, рекламу, оскорбительный контент или объявления о продаже вещей.</li>
+          <li>Если вещь нашлась, вернулась к владельцу или вы поняли, что она не ваша, удалите объявление.</li>
+          <li>При находке документов (студенческий, пропуск, паспорт) настоятельно рекомендуется сдать их в деканат или на вахту.</li>
+        </ol>
+      </section>
+      <section data-info-section="contacts" hidden>
+        <p>Email: <a href="mailto:era14@tpu.ru">era14@tpu.ru</a></p>
+        <p>Telegram: <a href="https://t.me/i_eatt_cement" target="_blank" rel="noopener">@i_eatt_cement</a></p>
+      </section>
+    </div>
   </div>
 </div>
+
+<!-- Контекст Django: сессия и справочники при серверном рендеринге -->
+<script id="django-context" type="application/json">
+{
+  "isAuthenticated": {% if user.is_authenticated %}true{% else %}false{% endif %},
+  "username": "{{ user.username|default:''|escapejs }}",
+  "email": "{{ user.email|default:''|escapejs }}",
+  "profile": {
+    "first_name": "{{ user.first_name|default:''|escapejs }}",
+    "last_name": "{{ user.last_name|default:''|escapejs }}",
+    "nickname": "{{ user.profile.nickname|default:''|escapejs }}",
+    "faculty": "{{ user.profile.faculty|default:''|escapejs }}",
+    "group": "{{ user.profile.group|default:''|escapejs }}",
+    "bio": "{{ user.profile.bio|default:''|escapejs }}",
+    "avatar": "{% if user.is_authenticated and user.profile.avatar %}{{ user.profile.avatar.url|escapejs }}{% endif %}"
+  },
+  "buildings": [{% if buildings %}{% for b in buildings %}{"id": {{ b.id }}, "name": "{{ b.name|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}{% endif %}],
+  "categories": [{% if categories %}{% for c in categories %}{"id": {{ c.id }}, "name": "{{ c.name|escapejs }}"}{% if not forloop.last %},{% endif %}{% endfor %}{% endif %}]
+}
+</script>
 
 <script src="{% static 'script.js' %}"></script>
 </body>

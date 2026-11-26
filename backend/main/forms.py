@@ -4,9 +4,15 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Profile, Item
 
 class ItemForm(forms.ModelForm):
+    status = forms.ChoiceField(
+        label='Статус',
+        choices=[(value, value.label) for value in Item.ACTIVE_STATUSES],
+        initial=Item.Status.FOUND,
+    )
+
     class Meta:
         model = Item
-        fields = ['title', 'description', 'location', 'status', 'category', 'image', 'building']
+        fields = ['title', 'description', 'contact', 'location', 'status', 'category', 'image', 'building']
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Например: Ключи от машины'}),
             'description': forms.Textarea(attrs={'rows': 3}),
