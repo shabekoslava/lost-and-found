@@ -149,6 +149,12 @@ class ItemDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ItemSerializer
     permission_classes = [IsAuthorOrReadOnly]
 
+    def get_queryset(self):
+        visible_items = Q(status__in=Item.ACTIVE_STATUSES)
+        if self.request.user.is_authenticated:
+            visible_items |= Q(author=self.request.user)
+        return super().get_queryset().filter(visible_items)
+
 
 class MyProfileView(generics.UpdateAPIView):
     serializer_class = MyProfileSerializer

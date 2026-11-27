@@ -121,6 +121,25 @@ class ItemAPITests(APITestCase):
         self.client.force_authenticate(user=other_user)
         self.assertEqual([item["id"] for item in self.client.get(my_items_url).data], [other_item.pk])
 
+    def test_inactive_item_details_are_visible_only_to_the_author(self):
+        other_user = User.objects.create_user(username="other_reader")
+        for item, closed_status in ((self.item1, Item.Status.RECOVERED), (self.item2, Item.Status.RETURNED)):
+            with self.subTest(item_status=closed_status):
+                detail_url = reverse("item-detail", args=[item.pk])
+                self.client.force_authenticate(user=None)
+                self.assertEqual(self.client.get(detail_url).status_code, status.HTTP_200_OK)
+                item.status = closed_status
+                item.save(update_fields=["status"])
+                self.assertEqual(self.client.get(detail_url).status_code, status.HTTP_404_NOT_FOUND)
+
+                self.client.force_authenticate(user=other_user)
+                self.assertEqual(self.client.get(detail_url).status_code, status.HTTP_404_NOT_FOUND)
+                self.assertEqual(self.client.patch(detail_url, {"title": "Чужая правка"}).status_code, status.HTTP_404_NOT_FOUND)
+
+                self.client.force_authenticate(user=self.user)
+                self.assertEqual(self.client.get(detail_url).data["id"], item.pk)
+                self.assertEqual(self.client.patch(detail_url, {"title": "Моя правка"}).status_code, status.HTTP_200_OK)
+
     def test_cannot_create_inactive_item(self):
         data = {
             "title": "Кошелёк", "description": "Коричневый", "location": "Столовая",

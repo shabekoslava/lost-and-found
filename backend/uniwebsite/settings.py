@@ -10,23 +10,43 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
+from django.core.management.utils import get_random_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = BASE_DIR.parent / 'frontend'
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
+debug_setting = os.environ.get('DJANGO_DEBUG', '1')
+if debug_setting not in {'0', '1'}:
+    raise ImproperlyConfigured('DJANGO_DEBUG must be 0 or 1.')
+DEBUG = debug_setting == '1'
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--ohjhvefe*(a7^hsib*6x=fb$4!r0)ia*bg-*yj*=bz=!rblc_'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
+ALLOWED_HOSTS = [
+    host.strip() for host in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+]
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if DEBUG:
+    SECRET_KEY = SECRET_KEY or get_random_secret_key()
+else:
+    if len(SECRET_KEY) < 50 or len(set(SECRET_KEY)) < 5 or SECRET_KEY.startswith('django-insecure-'):
+        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY to a new random key of at least 50 characters.')
+    if not ALLOWED_HOSTS or '*' in ALLOWED_HOSTS:
+        raise ImproperlyConfigured('Set DJANGO_ALLOWED_HOSTS to the allowed domain names.')
 
-ALLOWED_HOSTS = []
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
+SECURE_HSTS_SECONDS = int(os.environ.get('DJANGO_HSTS_SECONDS', '0')) if not DEBUG else 0
+
+if not DEBUG and os.environ.get('DJANGO_TRUST_PROXY_HTTPS') == '1':
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -119,6 +139,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [FRONTEND_DIR / 'static']
 
 
@@ -130,6 +151,20 @@ MAILERS = {
         'BACKEND': 'django.core.mail.backends.console.EmailBackend',
     },
 }
+if not DEBUG:
+    MAILERS['default'] = {
+        'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+        'OPTIONS': {
+            'host': os.environ.get('DJANGO_SMTP_HOST', 'localhost'),
+            'port': int(os.environ.get('DJANGO_SMTP_PORT', '25')),
+            'username': os.environ.get('DJANGO_SMTP_USER'),
+            'password': os.environ.get('DJANGO_SMTP_PASSWORD'),
+            'use_tls': os.environ.get('DJANGO_SMTP_USE_TLS') == '1',
+            'timeout': 10,
+        },
+    }
+    DEFAULT_FROM_EMAIL = os.environ.get('DJANGO_FROM_EMAIL', 'webmaster@localhost')
+
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
